@@ -19,12 +19,8 @@ def filter_videos():
     out_path = os.path.split(video)[0] + FILTERED_DIRECTORY_NAME + "/" + os.path.split(video)[1].replace(' ', '_')
     probe = ffmpeg.probe(video)
     end_start = int(float(probe['format']['duration'])) - 1
-    stream = ffmpeg.input(video)
-    audio_stream = stream.audio
-    video_stream = stream \
-    .filter('fade', t='in', st=0, d=1) \
-    .filter('fade', t='out', st=end_start, d=1)
-    ffmpeg.output(audio_stream, video_stream, out_path, acodec="copy").run()
+    ffmpeg.input(video) \
+    .output(out_path, acodec="copy", vf=f'fade=t=in:st=0:d=1,fade=t=out:st={end_start}:d=1').run()
 
 def join_videos():
   videos = glob.glob(FILTERED_DIRECTORY_NAME + "/*.mp4")
